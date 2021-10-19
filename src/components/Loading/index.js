@@ -1,9 +1,10 @@
-import "./index.scss";
+import Spinner from '../Spinner';
+
 
 export default function Loading () {
   return (
     <div className="loading">
-      loading...
+      <Spinner>Loading...</Spinner>
     </div>
   );
 }

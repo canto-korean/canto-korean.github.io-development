@@ -1,7 +1,6 @@
-import './App.scss';
 import {useEffect, useState} from 'react';
-import Loading from "./components/Loading";
-import Result from "./components/Result";
+import Loading from './components/Loading';
+import Result from './components/Result';
 import csvtojson from 'csvtojson';
 
 
