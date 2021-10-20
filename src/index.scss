@@ -1,5 +1,23 @@
 @import "https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic";
 @import "~normalize.css/normalize.css";
+
+/**
+ * @see https://colorhunt.co/palette/222831393e4600adb5eeeeee
+ */
+$color-1: #222831;
+$color-2: #393E46;
+$color-3: #00ADB5;
+$color-4: #EEEEEE;
+
+/**
+ * Overrides milligram's default colors
+ */
+$color-initial: $color-1;
+$color-primary: $color-3;
+$color-secondary: $color-4;
+$color-tertiary: $color-2;
+$color-quaternary: lighten($color-2, .2);
+
 @import "~milligram/src/_Color";
 @import "~milligram/src/_Base";
 @import "~milligram/src/_Blockquote";
@@ -21,8 +39,20 @@ html, body, #root {
   height: 100%;
 }
 
+body {
+  background-color: $color-initial;
+}
+
 a {
   word-break: break-all;
+}
+
+input {
+  color: $color-secondary;
+}
+
+.container {
+  max-width: 64rem;
 }
 
 @import "App";

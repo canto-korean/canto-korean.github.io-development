@@ -49,7 +49,10 @@
 
   &__highlight {
     display: inline-block;
-    background-color: yellow;
+    background-color: $color-primary;
+    color: $color-initial;
+    padding: 2px;
     border-radius: 2px;
+    font-weight: bold;
   }
 }
