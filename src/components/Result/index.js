@@ -1,9 +1,25 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import Spinner from "../Spinner";
+import Spinner from '../Spinner';
+import csvtojson from 'csvtojson';
 
 
 function keywordInRowFilter (keyword) {
     return row => row.some(word => word.includes(keyword));
+}
+
+function parseCsv (csv) {
+    return csvtojson({noheader: true, output: 'csv'}).fromString(csv);
+}
+
+function renderRow (row, search = /$a/) {
+  return row.filter(Boolean).map((word, index) => {
+    const output = word.split(search).map((segment, index, arr) => {
+      if (arr.length - 1 === index) { return segment; }
+      return <React.Fragment key={index}>{segment}<div className="result__highlight">{search}</div></React.Fragment>;
+    });
+    if (index === 0) { return (<code key={index} className="result__word result__word--chinese">{output}</code>); }
+    return (<div key={index} className="result__word result__word--korean">{output}</div>);
+});
 }
 
 export default function Result (props) {
@@ -14,18 +30,20 @@ export default function Result (props) {
   const [searchHistory, setSearchHistory] = useState({});
   const [searchResult, setSearchResult] = useState(null);
   const [search, setSearch] = useState("");
+  const [now, setNow] = useState(null);
+  const [wordOfDay, setWordOfDay] = useState(null);
   const pushSearchHistory = useCallback((key, value) => setSearchHistory(prevSearchHistory => ({...prevSearchHistory, [key]: value})), []);
   const onSearchChange = useCallback(event => { setShowIntro(false); setSearch(event.target.value); }, []);
 
   const generalSearch = useCallback(keyword => {
-      return spreadsheetData.filter(keywordInRowFilter(keyword));
+      return spreadsheetData.filter(line => line.includes(keyword));
   }, [spreadsheetData]);
 
   /**
    * Check if the current keyword exist in search history.
    * @param {string} keyword - The searching keyword which is tried to be found
    * in history.
-   * @returns {Array|null}
+   * @returns {Array<string>|null}
    */
   const historySearch = useMemo (() => {
     // Check if part of the keyword exists in the `searchHistory` map.
@@ -64,7 +82,7 @@ export default function Result (props) {
       if (search.trim() !== "") {
         const result = keywordSearch(search);
         pushSearchHistory(search, result);
-        setSearchResult(result);
+        parseCsv(result.join("\n")).then(setSearchResult);
       } else {
         setSearchResult(null);
       }
@@ -78,6 +96,14 @@ export default function Result (props) {
     if (el instanceof Element) { setPlaceholderHeight(el.getBoundingClientRect().height); }
   }, []);
 
+  useEffect(() => {
+    const now = new Date();
+    const todayDiff = Math.floor((+now) / (1000 * 60 * 60 * 24));
+    const line = spreadsheetData[spreadsheetData.length - 1 - (todayDiff % spreadsheetData.length)];
+    setNow(now);
+    parseCsv(line).then(arr => arr[0]).then(setWordOfDay);
+  }, [spreadsheetData]);
+
   return (
     <div className="result">
       <div className="result__input" ref={inputRef}>
@@ -87,10 +113,16 @@ export default function Result (props) {
       </div>
       <div className="container">
         <div className="result__placeholder" style={{height: placeholderHeight}} />
+        {!showIntro && !search && (!Array.isArray(searchResult) || searchResult.length === 0) ? <div className="result__guide">輸入搜索字詞，結果會喺呢度顯示。</div> : null}
         {
-          showIntro ? (
+          showIntro && now ? (
             <div className="result__intro">
-                Intro
+              <h5>每日單字 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
+              {wordOfDay ? renderRow(wordOfDay) : null}
+              <hr />
+              <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典</p>
+              <p>如果有咩問題或者想參與更加多廣東話同韓文嘅交流請Facebook登入：<a href="https://www.facebook.com/groups/806902066095149" target="_blank">https://www.facebook.com/groups/806902066095149</a></p>
+              <p>如果想支持 이정윤 嘅話可以到以下呢個網址：<a href="https://www.buymeacoffee.com/ncOhltm" target="_blank">https://www.buymeacoffee.com/ncOhltm</a></p>
             </div>
           ) : null
         }
@@ -100,14 +132,7 @@ export default function Result (props) {
               {searchResult.slice(0, 100).map((row, index) => {
                 return (
                   <tr key={index}><td>
-                    {row.map((word, index) => {
-                      const output = word.split(search).map((segment, index, arr) => {
-                        if (arr.length - 1 === index) { return segment; }
-                        return <React.Fragment key={index}>{segment}<div className="result__highlight">{search}</div></React.Fragment>;
-                      });
-                      if (index === 0) { return (<code key={index} className="result__word result__word--chinese">{output}</code>); }
-                      return (<div key={index} className="result__word result__word--korean">{output}</div>);
-                    })}
+                    {renderRow(row, search)}
                   </td></tr>
                 );
               })}

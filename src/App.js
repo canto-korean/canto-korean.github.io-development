@@ -10,9 +10,10 @@ function App() {
   useEffect(() => {
     fetch('https://docs.google.com/spreadsheets/d/106i6RLyxQYh-jgEnPxZ3TX3C-VT3-k7vY-7gdfoLTyI/export?format=csv')
       .then(response => response.text())
-      .then(csv => csvtojson({noheader: true, output: 'csv'}).fromString(csv))
+      // .then(csv => csvtojson({noheader: true, output: 'csv'}).fromString(csv))
+      .then(csv => csv.split("\n"))
       .then(arr => arr.slice(1))
-      .then(data => data.map(row => row.filter(Boolean)))
+      // .then(data => data.map(row => row.filter(Boolean)))
       .then(setSpreadsheetData);
   }, []);
 
