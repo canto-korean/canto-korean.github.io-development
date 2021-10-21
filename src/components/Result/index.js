@@ -100,7 +100,7 @@ export default function Result (props) {
 
   useEffect(() => {
     const now = new Date();
-    const todayDiff = Math.floor((+now) / (1000 * 60 * 60 * 24));
+    const todayDiff = Math.floor(((+now) - (now.getTimezoneOffset() * 60 * 1000)) / (1000 * 60 * 60 * 24));
     const line = spreadsheetData[spreadsheetData.length - 1 - (todayDiff % spreadsheetData.length)];
     setNow(now);
     parseCsv(line).then(arr => arr[0]).then(setWordOfDay);
