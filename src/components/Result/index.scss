@@ -3,8 +3,8 @@
 
   &__input {
     position: fixed;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     width: 100%;
     z-index: 5;
 
@@ -43,7 +43,7 @@
     }
 
     &:not(:last-child) {
-      margin-bottom: 7px;
+      margin-bottom: .7rem;
     }
   }
 
@@ -51,8 +51,8 @@
     display: inline-block;
     background-color: $color-primary;
     color: $color-initial;
-    padding: 2px;
-    border-radius: 2px;
+    padding: .2rem;
+    border-radius: .2rem;
     font-weight: bold;
   }
 }
