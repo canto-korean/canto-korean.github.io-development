@@ -122,7 +122,7 @@ function App() {
         .then(setSearchResult)
         .then(() => setLoading(false));
     }
-  }, [search, trimmedSearch]);
+  }, [search, trimmedSearch, pushSearchHistory, searchHistory]);
 
   useEffect(() => {
     const el = inputRef.current;
@@ -149,17 +149,17 @@ function App() {
               <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典網頁程式，多謝老師每日教我哋韓文。</p>
               <p>
                 資料來源<br />
-                •&nbsp;&nbsp;<a href="https://bit.ly/3oRQHCe" target="_blank">https://bit.ly/3oRQHCe</a>
+                •&nbsp;&nbsp;<a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer">https://bit.ly/3oRQHCe</a>
               </p>
               <p>
                 廣東話同韓文Facebook群組<br />
-                •&nbsp;&nbsp;<a href="https://www.facebook.com/groups/806902066095149" target="_blank">https://www.facebook.com/groups/806902066095149</a>
+                •&nbsp;&nbsp;<a href="https://www.facebook.com/groups/806902066095149" target="_blank" rel="noreferrer">https://www.facebook.com/groups/806902066095149</a>
               </p>
               <p>
                 到Buy Me a Coffee支持老師<br />
-                •&nbsp;&nbsp;<a href="https://www.buymeacoffee.com/ncOhltm" target="_blank">https://www.buymeacoffee.com/ncOhltm</a>
+                •&nbsp;&nbsp;<a href="https://www.buymeacoffee.com/ncOhltm" target="_blank" rel="noreferrer">https://www.buymeacoffee.com/ncOhltm</a>
               </p>
-              <p className="app__author"><small>應用程式製作 by <a href="https://github.com/winghimjns" target="_blank">winghimjns</a></small></p>
+              <p className="app__author"><small>應用程式製作 by <a href="https://github.com/winghimjns" target="_blank" rel="noreferrer">winghimjns</a></small></p>
             </div>
           ) : null
         }
