@@ -19,4 +19,6 @@
   &__text {
     text-align: center;
   }
+
+  &--left &__spinner { margin-left: 0; }
 }
