@@ -46,6 +46,24 @@ function renderRow (row, search = /$a/) {
   });
 }
 
+function renderSkeleton (rowNum = 1, searchingWord = <>正在搜尋...<br />검색중...</>) {
+    const skeleton = [...Array(rowNum)].map((nothing, index) => (
+      <React.Fragment key={index}>
+        <code className="app__word app__word--chinese app__word--placeholder"><span className="app__word-placeholder">........</span></code>
+        <div className="app__word app__word--korean">1. <span className="app__word-placeholder app__word-placeholder--background-color">................................</span></div>
+        <div className="app__word app__word--korean">2. <span className="app__word-placeholder app__word-placeholder--background-color">..........................</span></div>
+        <div className="app__word app__word--korean">3. <span className="app__word-placeholder app__word-placeholder--background-color">................................................</span></div>
+        <hr />
+      </React.Fragment>
+    ));
+    return (
+      <div className="app__skeleton">
+        {skeleton}
+        {searchingWord ? <Spinner absoluteCenter>{searchingWord}</Spinner> : null}
+      </div>
+    );
+}
+
 function App() {
   // ==========
   // Refs
@@ -64,6 +82,7 @@ function App() {
   const [searchHistory, setSearchHistory] = useState({}); // TODO
   const [searchResult, setSearchResult] = useState(null);
   const [wordOfDay, setWordOfDay] = useState(null);
+  const [count, setCount] = useState(null);
 
   // ==========
   // Callbacks
@@ -92,6 +111,7 @@ function App() {
     (async function () {
       const rows = await countRows();
       const wordOfDayRows = await byRowNum(rows - (todayDiff % rows));
+      setCount(rows);
       parseCsv(wordOfDayRows).then(arr => arr[0]).then(setWordOfDay);
     })();
   }, []);
@@ -139,14 +159,14 @@ function App() {
       <div className="container">
         <div className="app__placeholder" style={{height: placeholderHeight}} />
         {!showIntro && !trimmedSearch && (!Array.isArray(searchResult) || searchResult.length === 0) ? <div className="app__guide">輸入搜索字詞，結果會喺呢度顯示。</div> : null}
-        {loading && trimmedSearch ? <Spinner>正在搜尋...<br />검색중...</Spinner> : null}
+        {loading && trimmedSearch ? renderSkeleton(3, true) : null}
         {
           showIntro && now ? (
             <div className="app__intro">
               <h5>每日單字 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
-              {wordOfDay ? renderRow(wordOfDay) : <Spinner left />}
-              <hr />
+              {wordOfDay ? (<>{renderRow(wordOfDay)}<hr /></>) : renderSkeleton(1, <>等等...<br />잠시만 기다리세요.</>)}
               <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典網頁程式，多謝老師每日教我哋韓文。</p>
+              <p>現已收錄 {typeof count === "number" ? count : "..."} 個記錄。</p>
               <p>
                 資料來源<br />
                 •&nbsp;&nbsp;<a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer">https://bit.ly/3oRQHCe</a>
