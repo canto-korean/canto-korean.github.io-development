@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import Spinner from './components/Spinner';
 import csvtojson from 'csvtojson';
 
 
@@ -46,23 +45,28 @@ function renderRow (row, search = /$a/) {
   });
 }
 
-function renderSkeleton (rowNum = 1, searchingWord = <>正在搜尋...<br />검색중...</>) {
+function renderSkeleton (rowNum = 1) {
     const skeleton = [...Array(rowNum)].map((nothing, index) => (
-      <React.Fragment key={index}>
-        <code className="app__word app__word--chinese app__word--placeholder"><span className="app__word-placeholder">........</span></code>
-        <div className="app__word app__word--korean">1. <span className="app__word-placeholder app__word-placeholder--background-color">................................</span></div>
-        <div className="app__word app__word--korean">2. <span className="app__word-placeholder app__word-placeholder--background-color">..........................</span></div>
-        <div className="app__word app__word--korean">3. <span className="app__word-placeholder app__word-placeholder--background-color">................................................</span></div>
-        <hr />
-      </React.Fragment>
+      <tr key={index}>
+        <td>
+          <code className="app__word app__word--chinese app__word--placeholder">...........</code>
+          <div className="app__word app__word--korean">1. <span className="app__word-placeholder app__word-placeholder--background-color">..................................................................</span></div>
+          <div className="app__word app__word--korean">2. <span className="app__word-placeholder app__word-placeholder--background-color">............................................</span></div>
+          <div className="app__word app__word--korean">3. <span className="app__word-placeholder app__word-placeholder--background-color">....................................................................................</span></div>
+        </td>
+      </tr>
     ));
     return (
-      <div className="app__skeleton">
-        {skeleton}
-        {searchingWord ? <Spinner absoluteCenter>{searchingWord}</Spinner> : null}
-      </div>
+      <table className="app__table">
+        <tbody>
+          {skeleton}
+        </tbody>
+      </table>
     );
 }
+
+
+
 
 function App() {
   // ==========
@@ -159,12 +163,12 @@ function App() {
       <div className="container">
         <div className="app__placeholder" style={{height: placeholderHeight}} />
         {!showIntro && !trimmedSearch && (!Array.isArray(searchResult) || searchResult.length === 0) ? <div className="app__guide">輸入搜索字詞，結果會喺呢度顯示。</div> : null}
-        {loading && trimmedSearch ? renderSkeleton(3, true) : null}
+        {loading && trimmedSearch ? renderSkeleton(3) : null}
         {
           showIntro && now ? (
             <div className="app__intro">
               <h5>每日單字 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
-              {wordOfDay ? (<>{renderRow(wordOfDay)}<hr /></>) : renderSkeleton(1, <>等等...<br />잠시만 기다리세요.</>)}
+              {wordOfDay ? (<table><tbody><tr><td>{renderRow(wordOfDay)}</td></tr></tbody></table>) : renderSkeleton(1)}
               <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典網頁程式，多謝老師每日教我哋韓文。</p>
               <p>現已收錄 {typeof count === "number" ? count : "..."} 個記錄。</p>
               <p>

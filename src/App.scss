@@ -2,8 +2,9 @@
   width: 100%;
   height: 100%;
 
-  &__skeleton {
-    position: relative;
+  @keyframes placeholderBefore {
+    0% { left: 0; }
+    100% { left: $container-width; }
   }
 
   &__input {
@@ -37,6 +38,7 @@
   }
 
   &__word {
+    position: relative;
     line-height: 1.2;
 
     &--chinese {
@@ -47,17 +49,46 @@
       font-size: .9em;
     }
 
+    &--placeholder {
+      color: transparent;
+      overflow: hidden;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4em;
+        height: 100%;
+        background: linear-gradient(90deg, rgba($color-1, 0) 0%, rgba($color-1, .6) 50%, rgba($color-1, 0) 100%);
+        animation: placeholderBefore 1s linear infinite;
+      }
+    }
+
     &:not(:last-child) {
       margin-bottom: .7rem;
     }
   }
 
   &__word-placeholder {
+    position: relative;
     border-radius: .2rem;
     color: transparent;
+    overflow: hidden;
 
     &--background-color {
       background-color: $color-2;
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4em;
+      height: 100%;
+      background: linear-gradient(90deg, rgba($color-1, 0) 0%, rgba($color-1, .6) 50%, rgba($color-1, 0) 100%);
+      animation: placeholderBefore 1s linear infinite;
     }
   }
 

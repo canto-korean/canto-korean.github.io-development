@@ -18,6 +18,11 @@ $color-secondary: $color-4;
 $color-tertiary: $color-2;
 $color-quaternary: lighten($color-2, .2);
 
+/**
+ * Custom
+ */
+$container-width: 64rem;
+
 @import "~milligram/src/_Color";
 @import "~milligram/src/_Base";
 @import "~milligram/src/_Blockquote";
@@ -53,8 +58,7 @@ input {
 }
 
 .container {
-  max-width: 64rem;
+  max-width: $container-width;
 }
 
 @import "App";
-@import "components/Spinner";
