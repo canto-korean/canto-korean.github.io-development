@@ -4,6 +4,8 @@ import csvtojson from 'csvtojson';
 
 const spreadsheetId = '106i6RLyxQYh-jgEnPxZ3TX3C-VT3-k7vY-7gdfoLTyI';
 
+const externalLinkSvg = (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#00ADB5" d="M5 3c-1.093 0-2 .907-2 2v14c0 1.093.907 2 2 2h14c1.093 0 2-.907 2-2v-7h-2v7H5V5h7V3H5zm9 0v2h3.586l-9.293 9.293 1.414 1.414L19 6.414V10h2V3h-7z" /></svg>);
+
 function runQuery (query) {
     /**
      * Param "tqx=out:csv" is that the data should be responded as CSV format;
@@ -168,20 +170,24 @@ function App() {
           showIntro && now ? (
             <div className="app__intro">
               <h5>每日單字 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
-              {wordOfDay ? (<table><tbody><tr><td>{renderRow(wordOfDay)}</td></tr></tbody></table>) : renderSkeleton(1)}
+              {wordOfDay ? (<table className="app__table"><tbody><tr><td>{renderRow(wordOfDay)}</td></tr></tbody></table>) : renderSkeleton(1)}
               <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典網頁程式，多謝老師每日教我哋韓文。</p>
               <p>現已收錄 {typeof count === "number" ? count : "..."} 個記錄。</p>
               <p>
-                資料來源<br />
-                •&nbsp;&nbsp;<a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer">https://bit.ly/3oRQHCe</a>
-              </p>
-              <p>
-                廣東話同韓文Facebook群組<br />
-                •&nbsp;&nbsp;<a href="https://www.facebook.com/groups/806902066095149" target="_blank" rel="noreferrer">https://www.facebook.com/groups/806902066095149</a>
-              </p>
-              <p>
-                到Buy Me a Coffee支持老師<br />
-                •&nbsp;&nbsp;<a href="https://www.buymeacoffee.com/ncOhltm" target="_blank" rel="noreferrer">https://www.buymeacoffee.com/ncOhltm</a>
+                <ul className="app__external-links">
+                  <li>
+                    資料來源 <a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer"> {externalLinkSvg} https://bit.ly/3oRQHCe</a>
+                  </li>
+                  <li>
+                    廣東話同韓文Facebook群組 <a href="https://www.facebook.com/groups/806902066095149" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.facebook.com/groups/806902066095149</a>
+                  </li>
+                  <li>
+                    老師 Buy Me a Coffee <a href="https://www.buymeacoffee.com/ncOhltm" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.buymeacoffee.com/ncOhltm</a>
+                  </li>
+                  <li>
+                    老師 Patreon <a href="https://www.patreon.com/user?u=34023316" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.patreon.com/user?u=34023316</a>
+                  </li>
+                </ul>
               </p>
               <p className="app__author"><small>應用程式製作 by <a href="https://github.com/winghimjns" target="_blank" rel="noreferrer">winghimjns</a></small></p>
             </div>

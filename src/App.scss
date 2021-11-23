@@ -37,6 +37,16 @@
     //
   }
 
+  &__external-links {
+
+    > li {
+      overflow: hidden;
+      word-wrap: normal;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
   &__word {
     position: relative;
     line-height: 1.2;
