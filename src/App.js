@@ -52,7 +52,7 @@ function renderSkeleton (rowNum = 1) {
           <code className="app__word app__word--chinese app__word--placeholder">...........</code>
           <div className="app__word app__word--korean">1. <span className="app__word-placeholder app__word-placeholder--background-color">..................................................................</span></div>
           <div className="app__word app__word--korean">2. <span className="app__word-placeholder app__word-placeholder--background-color">............................................</span></div>
-          <div className="app__word app__word--korean">3. <span className="app__word-placeholder app__word-placeholder--background-color">....................................................................................</span></div>
+          <div className="app__word app__word--korean">3. <span className="app__word-placeholder app__word-placeholder--background-color">.....................................................</span></div>
         </td>
       </tr>
     ));
