@@ -101,14 +101,6 @@ function App() {
   const [count, setCount] = useState(null);
 
   // ==========
-  // Memos
-  // ==========
-  const latestWordsNode = useMemo(() => {
-      if (!Array.isArray(latestWords)) { return <Spinner />; }
-      return latestWords.map(([word], index) => <code className="app__latest-word" key={index} onClick={() => { setSearchWord(word); }}>{word}</code>);
-  }, [latestWords, textRef.current]);
-
-  // ==========
   // Callbacks
   // ==========
   const setSearchWord = useCallback(value => {
@@ -117,9 +109,17 @@ function App() {
     setSearch(value);
     setTrimmedSearch(value.trim());
   }, []);
-  const onSearchInputChange = useCallback(event => { setSearchWord(event.target.value); }, []);
-  const onClearButtonClick = useCallback(() => { setSearchWord(""); }, []);
+  const onSearchInputChange = useCallback(event => { setSearchWord(event.target.value); }, [setSearchWord]);
+  const onClearButtonClick = useCallback(() => { setSearchWord(""); }, [setSearchWord]);
   const pushSearchHistory = useCallback((key, value) => setSearchHistory(prevSearchHistory => ({...prevSearchHistory, [key]: value})), []);
+
+  // ==========
+  // Memos
+  // ==========
+  const latestWordsNode = useMemo(() => {
+      if (!Array.isArray(latestWords)) { return <Spinner />; }
+      return latestWords.map(([word], index) => <code className="app__latest-word" key={index} onClick={() => { setSearchWord(word); }}>{word}</code>);
+  }, [latestWords, setSearchWord]);
 
   // ==========
   // Constants
