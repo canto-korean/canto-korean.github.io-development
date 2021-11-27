@@ -174,6 +174,9 @@ function App() {
               <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典網頁程式，多謝老師每日教我哋韓文。</p>
               <p>現已收錄 {typeof count === "number" ? count : "..."} 個記錄。</p>
               <p>
+                <a href="https://docs.google.com/forms/d/1FZkQx42_2uurNOU_CRO3o-EYszGolMBxFjherNJWaj4/viewform" target="_blank">{externalLinkSvg} 到此提交新記錄請求 (Google Form)</a>
+              </p>
+              <p>
                 <ul className="app__external-links">
                   <li>
                     資料來源 <a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer"> {externalLinkSvg} https://bit.ly/3oRQHCe</a>
