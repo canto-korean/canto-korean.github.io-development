@@ -57,8 +57,13 @@ input {
   color: $color-secondary;
 }
 
+hr {
+  border-color: $color-secondary;
+}
+
 .container {
   max-width: $container-width;
 }
 
 @import "App";
+@import "components/Spinner";

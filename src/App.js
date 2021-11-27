@@ -1,8 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import Spinner from "./components/Spinner";
 import csvtojson from 'csvtojson';
 
 
 const spreadsheetId = '106i6RLyxQYh-jgEnPxZ3TX3C-VT3-k7vY-7gdfoLTyI';
+const latestWordCount = 15;
 
 const externalLinkSvg = (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#00ADB5" d="M5 3c-1.093 0-2 .907-2 2v14c0 1.093.907 2 2 2h14c1.093 0 2-.907 2-2v-7h-2v7H5V5h7V3H5zm9 0v2h3.586l-9.293 9.293 1.414 1.414L19 6.414V10h2V3h-7z" /></svg>);
 
@@ -28,8 +30,14 @@ function countRows (query) {
 
 function byRowNum (rowNum) {
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&range=A${rowNum + 1}:G${rowNum + 1}`;
-  return fetch(url)
-   .then(response => response.text());
+  return fetch(url).then(response => response.text());
+}
+
+function byTopRows (num) {
+    const firstRow = 2;
+    const lastRow = firstRow + num - 1;
+    const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&range=A${firstRow}:G${lastRow}`;
+    return fetch(url).then(response => response.text());
 }
 
 function parseCsv (csv) {
@@ -45,6 +53,10 @@ function renderRow (row, search = /$a/) {
     if (index === 0) { return (<code key={index} className="app__word app__word--chinese">{output}</code>); }
     return (<div key={index} className="app__word app__word--korean">{index}. {output}</div>);
   });
+}
+
+function renderRows (rows, search = /$a/) {
+    return rows.map((row, index) => (<tr key={index}><td>{renderRow(row, search)}</td></tr>));
 }
 
 function renderSkeleton (rowNum = 1) {
@@ -67,9 +79,6 @@ function renderSkeleton (rowNum = 1) {
     );
 }
 
-
-
-
 function App() {
   // ==========
   // Refs
@@ -85,20 +94,31 @@ function App() {
   const [showIntro, setShowIntro] = useState(true);
   const [search, setSearch] = useState('');
   const [trimmedSearch, setTrimmedSearch] = useState('');
-  const [searchHistory, setSearchHistory] = useState({}); // TODO
+  const [searchHistory, setSearchHistory] = useState({});
   const [searchResult, setSearchResult] = useState(null);
   const [wordOfDay, setWordOfDay] = useState(null);
+  const [latestWords, setLatestWords] = useState(null);
   const [count, setCount] = useState(null);
+
+  // ==========
+  // Memos
+  // ==========
+  const latestWordsNode = useMemo(() => {
+      if (!Array.isArray(latestWords)) { return <Spinner />; }
+      return latestWords.map(([word], index) => <code className="app__latest-word" key={index} onClick={() => { setSearchWord(word); }}>{word}</code>);
+  }, [latestWords, textRef.current]);
 
   // ==========
   // Callbacks
   // ==========
-  const onSearchChange = useCallback(event => {
-      setLoading(true);
-      setShowIntro(false);
-      setSearch(event.target.value);
-      setTrimmedSearch(event.target.value.trim());
+  const setSearchWord = useCallback(value => {
+    setLoading(true);
+    setShowIntro(false);
+    setSearch(value);
+    setTrimmedSearch(value.trim());
   }, []);
+  const onSearchInputChange = useCallback(event => { setSearchWord(event.target.value); }, []);
+  const onClearButtonClick = useCallback(() => { setSearchWord(""); }, []);
   const pushSearchHistory = useCallback((key, value) => setSearchHistory(prevSearchHistory => ({...prevSearchHistory, [key]: value})), []);
 
   // ==========
@@ -110,8 +130,10 @@ function App() {
     textRef.current.focus();
   }, []);
 
+  /**
+   * Fetch the "word count" and "word of day"
+   */
   useEffect(() => {
-    const now = new Date();
     const todayDiff = Math.floor(((+now) - (now.getTimezoneOffset() * 60 * 1000)) / (1000 * 60 * 60 * 24));
 
     (async function () {
@@ -119,6 +141,16 @@ function App() {
       const wordOfDayRows = await byRowNum(rows - (todayDiff % rows));
       setCount(rows);
       parseCsv(wordOfDayRows).then(arr => arr[0]).then(setWordOfDay);
+    })();
+  }, [now]);
+
+  /**
+   * Latest added words
+   */
+  useEffect(() => {
+    (async function () {
+      const topRows = await byTopRows(latestWordCount);
+      parseCsv(topRows).then(setLatestWords);
     })();
   }, []);
 
@@ -159,39 +191,46 @@ function App() {
     <div className="app">
       <div className="app__input" ref={inputRef}>
         <div className="container">
-          <input value={search} onChange={onSearchChange} placeholder="검색 搜尋" ref={textRef} />
+          <input value={search} onChange={onSearchInputChange} placeholder="검색 搜尋" ref={textRef} />
+          <button className="button" disabled={!search} onClick={onClearButtonClick}>清除 해제</button>
         </div>
       </div>
       <div className="container">
         <div className="app__placeholder" style={{height: placeholderHeight}} />
-        {!showIntro && !trimmedSearch && (!Array.isArray(searchResult) || searchResult.length === 0) ? <div className="app__guide">輸入搜索字詞，結果會喺呢度顯示。</div> : null}
+        {!showIntro && !trimmedSearch && (!Array.isArray(searchResult) || searchResult.length === 0) ? <div className="app__guide">輸入搜索字詞，結果會喺呢度顯示。<hr /></div> : null}
         {loading && trimmedSearch ? renderSkeleton(3) : null}
+        {!trimmedSearch && (!Array.isArray(searchResult) || searchResult.length === 0) ?
+        (
+          <>
+            <h5>每日詞語 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
+            {wordOfDay ? (<table className="app__table"><tbody><tr><td>{renderRow(wordOfDay)}</td></tr></tbody></table>) : renderSkeleton(1)}
+            <h5>最近收錄詞語 {latestWordCount} 個 최근의 단어 {latestWordCount}게</h5>
+            {latestWordsNode}
+            <hr />
+          </>
+        ) : null}
         {
           showIntro && now ? (
             <div className="app__intro">
-              <h5>每日單字 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
-              {wordOfDay ? (<table className="app__table"><tbody><tr><td>{renderRow(wordOfDay)}</td></tr></tbody></table>) : renderSkeleton(1)}
               <p>呢個係一個依照由 이정윤 老師提供嘅字典所做嘅簡單廣東話韓文詞典網頁程式，多謝老師每日教我哋韓文。</p>
               <p>現已收錄 {typeof count === "number" ? count : "..."} 個記錄。</p>
               <p>
-                <a href="https://docs.google.com/forms/d/1FZkQx42_2uurNOU_CRO3o-EYszGolMBxFjherNJWaj4/viewform" target="_blank">{externalLinkSvg} 到此提交新記錄請求 (Google Form)</a>
+                <a href="https://docs.google.com/forms/d/1FZkQx42_2uurNOU_CRO3o-EYszGolMBxFjherNJWaj4/viewform" target="_blank" rel="noreferrer">{externalLinkSvg} 到此提交新記錄請求 (Google Form)</a>
               </p>
-              <p>
-                <ul className="app__external-links">
-                  <li>
-                    資料來源 <a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer"> {externalLinkSvg} https://bit.ly/3oRQHCe</a>
-                  </li>
-                  <li>
-                    廣東話同韓文Facebook群組 <a href="https://www.facebook.com/groups/806902066095149" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.facebook.com/groups/806902066095149</a>
-                  </li>
-                  <li>
-                    老師 Buy Me a Coffee <a href="https://www.buymeacoffee.com/ncOhltm" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.buymeacoffee.com/ncOhltm</a>
-                  </li>
-                  <li>
-                    老師 Patreon <a href="https://www.patreon.com/user?u=34023316" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.patreon.com/user?u=34023316</a>
-                  </li>
-                </ul>
-              </p>
+              <ul className="app__external-links">
+                <li>
+                  資料來源 <a href="https://bit.ly/3oRQHCe" target="_blank" rel="noreferrer"> {externalLinkSvg} https://bit.ly/3oRQHCe</a>
+                </li>
+                <li>
+                  廣東話同韓文Facebook群組 <a href="https://www.facebook.com/groups/806902066095149" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.facebook.com/groups/806902066095149</a>
+                </li>
+                <li>
+                  老師 Buy Me a Coffee <a href="https://www.buymeacoffee.com/ncOhltm" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.buymeacoffee.com/ncOhltm</a>
+                </li>
+                <li>
+                  老師 Patreon <a href="https://www.patreon.com/user?u=34023316" target="_blank" rel="noreferrer"> {externalLinkSvg} https://www.patreon.com/user?u=34023316</a>
+                </li>
+              </ul>
               <p className="app__author"><small>應用程式製作 by <a href="https://github.com/winghimjns" target="_blank" rel="noreferrer">winghimjns</a></small></p>
             </div>
           ) : null
@@ -200,13 +239,7 @@ function App() {
         {!loading && Array.isArray(searchResult) ? (
           <table className="app__table">
             <tbody>
-              {searchResult.slice(0, 100).map((row, index) => {
-                return (
-                  <tr key={index}><td>
-                    {renderRow(row, trimmedSearch)}
-                  </td></tr>
-                );
-              })}
+              {renderRows(searchResult.slice(0, 100), trimmedSearch)}
             </tbody>
           </table>
         ) : null}

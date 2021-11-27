@@ -14,8 +14,19 @@
     width: 100%;
     z-index: 5;
 
+    > .container {
+      display: flex;
+    }
+
     input {
-        background-color: $color-initial;
+      background-color: $color-initial;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    button {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
     }
   }
 
@@ -27,6 +38,10 @@
     display: table;
     width: 100%;
     max-width: 100%;
+    overflow: hidden;
+
+    tr { width: 100%; }
+    td { width: 100%; }
   }
 
   &__guide {
@@ -35,6 +50,10 @@
 
   &__intro {
     //
+  }
+
+  &__latest-word {
+    cursor: pointer;
   }
 
   &__external-links {
@@ -61,7 +80,6 @@
 
     &--placeholder {
       color: transparent;
-      overflow: hidden;
 
       &:before {
         content: '';
@@ -112,10 +130,10 @@
   }
 
   &__author {
-    position: fixed;
-    bottom: .5rem;
-    right: .5rem;
-    opacity: .8;
+    text-align: right;
+    line-height: 1;
+    padding-bottom: 1rem;
     margin-bottom: 0;
+    opacity: .8;
   }
 }
