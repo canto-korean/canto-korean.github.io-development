@@ -204,7 +204,7 @@ function App() {
           <>
             <h5>每日詞語 오늘의 단어 ({`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`})</h5>
             {wordOfDay ? (<table className="app__table"><tbody><tr><td>{renderRow(wordOfDay)}</td></tr></tbody></table>) : renderSkeleton(1)}
-            <h5>最近收錄詞語 {latestWordCount} 個 최근의 단어 {latestWordCount}게</h5>
+            <h5>最近收錄詞語 {latestWordCount} 個 최근의 단어 {latestWordCount}개</h5>
             {latestWordsNode}
             <hr />
           </>
